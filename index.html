@@ -245,6 +245,23 @@
       }
       shards.oninput = shards.onchange
 
+      let button = document.createElement('button')
+      button.textContent = '<<'
+      button.onclick = () => {
+        lhInputs = [...lhs.querySelectorAll('input')]
+        rhInputs = [...rhs.querySelectorAll('input')]
+        if (rhInputs[0].value[0] != '?') {
+          lhInputs.forEach((_, index) => {
+            lhInputs[index].value = rhInputs[index].value
+          })
+        }
+        shards.value = '0'
+        debounce()
+      }
+
+      let buttonContainer = document.createElement('div')
+      buttonContainer.appendChild(button)
+
       let boxContainer = document.createElement('div')
       boxContainer.style.margin = '0 auto'
       boxContainer.style.padding = '0 10%'
@@ -256,6 +273,7 @@
       container.appendChild(header)
       container.appendChild(shards)
       container.appendChild(boxContainer)
+      container.appendChild(buttonContainer)
       document.body.appendChild(container)
     </script>
   </body>
