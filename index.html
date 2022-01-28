@@ -92,14 +92,43 @@
         gear = gear.map(i => i)
         let spent = 0
         let upgrades = 0
-        for (let i = 0; i < order.length && spent < shards; ++i) {
-          if (gear[order[i].slot] - 590 === order[i].gs) {
-            if (spent + costs[order[i].gs] > shards) {
+        let allAbove599 = !gear.find(gs => gs < 600)
+        if (allAbove599) {
+          for (let i = 0; i < order.length && spent < shards; ++i) {
+            if (gear[order[i].slot] - 590 === order[i].gs) {
+              if (spent + costs[order[i].gs] > shards) {
+                break
+              }
+              upgrades += 1
+              spent += costs[order[i].gs]
+              gear[order[i].slot] += 1
+            }
+          }
+        } else {
+          while (shards > 0) {
+            // heap when
+            let best = gear.reduce((max, gs, slot) => {
+              if (gs > 624) {
+                return max
+              }
+              if (max < 0) {
+                return slot
+              }
+              let vMax = weights[max] / costs[gear[max] - 590]
+              let vCurrent = weights[slot] / costs[gs - 590]
+              if (vMax < vCurrent) {
+                return slot
+              }
+              return max
+            }, -1)
+            if (best === -1) {
               break
             }
-            upgrades += 1
-            spent += costs[order[i].gs]
-            gear[order[i].slot] += 1
+            if (shards < costs[gear[best] - 590]) {
+              break
+            }
+            shards -= costs[gear[best] - 590]
+            gear[best] += 1
           }
         }
         return gear
