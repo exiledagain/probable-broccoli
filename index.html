@@ -109,7 +109,7 @@
           while (shards > 0) {
             // heap when
             let best = gear.reduce((max, gs, slot) => {
-              if (gs > 624) {
+              if (gs > 624 || gs < 590) {
                 return max
               }
               if (max < 0) {
