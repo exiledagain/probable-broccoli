@@ -185,6 +185,7 @@
           }
         })
 
+        estimateShardsToRaiseGS()
         save()
       }
 
@@ -291,6 +292,26 @@
         debounce()
       }
 
+      let estimatedShardsLabel = document.createElement('h5')
+      let estimatedShardsValueLabel = document.createElement('h3')
+      estimatedShardsLabel.textContent = 'Est. shards needed to raise GS:'
+
+      function estimateShardsToRaiseGS () {
+        let gear = getGear()
+        let currentEstimatedGS = estimateGs(gear)
+
+        if (currentEstimatedGS >= 625) {
+          return;
+        }
+
+        let shards = 1;
+        let estimatedGS = currentEstimatedGS
+        while (estimatedGS <= currentEstimatedGS) {
+          estimatedGS = estimateGs(findUpgrades(gear, shards++))
+        }
+
+        estimatedShardsValueLabel.textContent = shards
+      }
 
       /// Save input gearscore to local web storage
       function save () {
@@ -313,6 +334,11 @@
       }
       let buttonContainer = document.createElement('div')
       buttonContainer.appendChild(button)
+
+      buttonContainer.appendChild(document.createElement('br'))
+      buttonContainer.appendChild(document.createElement('br'))
+      buttonContainer.appendChild(estimatedShardsLabel)
+      buttonContainer.appendChild(estimatedShardsValueLabel)
 
       let boxContainer = document.createElement('div')
       boxContainer.style.margin = '0 auto'
