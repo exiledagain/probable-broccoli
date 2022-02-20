@@ -184,6 +184,8 @@
             input.style.borderColor = 'green'
           }
         })
+
+        save()
       }
 
       let updateTimeout = null
@@ -289,6 +291,26 @@
         debounce()
       }
 
+
+      /// Save input gearscore to local web storage
+      function save () {
+        localStorage.lhInputs = [...lhs.querySelectorAll('input')].map(input => input.value)
+      }
+
+      /// Load from web storage to input gearscore if there is data
+      function load () {
+        if (!localStorage.lhInputs) {
+          return;
+        }
+
+        let lhInputsValues = localStorage.lhInputs.split(",")
+
+        lhs.querySelectorAll('input').forEach((input, index) => {
+          input.value = lhInputsValues[index]
+        })
+
+        debounce()
+      }
       let buttonContainer = document.createElement('div')
       buttonContainer.appendChild(button)
 
@@ -305,6 +327,8 @@
       container.appendChild(boxContainer)
       container.appendChild(buttonContainer)
       document.body.appendChild(container)
+
+      load()
     </script>
   </body>
 </html>
