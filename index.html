@@ -310,7 +310,7 @@
         let estimatedGS = currentEstimatedGS
         let cannotBeEstimated = false
         while (estimatedGS <= currentEstimatedGS) {
-          estimatedGS = estimateGs(findUpgrades(gear, shards++), true)
+          estimatedGS = estimateGs(findUpgrades(gear, shards++))
 
           if (shards >= shardsSoftCap) {
             cannotBeEstimated = true
