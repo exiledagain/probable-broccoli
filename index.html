@@ -294,6 +294,8 @@
       let estimatedShardsLabel = document.createElement('h5')
       let estimatedShardsValueLabel = document.createElement('h3')
       estimatedShardsLabel.textContent = 'Est. shards needed to raise GS:'
+      
+      const shardsSoftCap = (costs[costs.length - 1] * slots.length);
 
       function estimateShardsToRaiseGS () {
         let gear = getGear()
@@ -305,11 +307,21 @@
 
         let shards = 1;
         let estimatedGS = currentEstimatedGS
+        let cannotBeEstimated = false
         while (estimatedGS <= currentEstimatedGS) {
-          estimatedGS = estimateGs(findUpgrades(gear, shards++))
+          estimatedGS = estimateGs(findUpgrades(gear, shards++), true)
+
+          if (shards >= shardsSoftCap) {
+            cannotBeEstimated = true
+            break
+          }
         }
 
-        estimatedShardsValueLabel.textContent = shards
+        if (cannotBeEstimated) {
+          estimatedShardsValueLabel.textContent = "Cannot be estimated"
+        } else {
+          estimatedShardsValueLabel.textContent = shards
+        }
       }
 
       let buttonContainer = document.createElement('div')
