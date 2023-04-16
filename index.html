@@ -163,8 +163,10 @@
       }
 
       let estimateGs = gear => {
+        if (!gear.find(gs => gs < 625)) {
+          return 625
+        }
         let est = gear.reduce((sum, gs, index) => sum + (gs - 600) * weights[index], 600)
-        console.log(`Est Gs: ${est}`)
         return Math.floor(est - 0.5)
       }
 
@@ -296,29 +298,31 @@
       let estimatedShardsValueLabel = document.createElement('h3')
       estimatedShardsLabel.textContent = 'Est. shards needed to raise GS:'
       
-      const shardsSoftCap = (costs[costs.length - 1] * slots.length);
+      const shardsSoftCap = (costs[costs.length - 1] * slots.length * slots.length)
+
+      let lowerbound = (a, b, cnd) => {
+        let range = b - a
+        while (range > 0) {
+          let half = range >> 1
+          let c = a + half
+          if (cnd(c)) {
+            a += half + 1
+            range -= half + 1
+          } else {
+            range = half
+          }
+        }
+        return a
+      }
 
       function estimateShardsToRaiseGS () {
         let gear = getGear()
         let currentEstimatedGS = estimateGs(gear)
 
-        if (currentEstimatedGS >= 625) {
-          return;
-        }
+        let cnd = amount => estimateGs(findUpgrades(gear, amount)) <= currentEstimatedGS
+        let shards = currentEstimatedGS !== 625 ? lowerbound(1, shardsSoftCap + 1, cnd) : (shardsSoftCap + 1)
 
-        let shards = 1;
-        let estimatedGS = currentEstimatedGS
-        let cannotBeEstimated = false
-        while (estimatedGS <= currentEstimatedGS) {
-          estimatedGS = estimateGs(findUpgrades(gear, shards++))
-
-          if (shards >= shardsSoftCap) {
-            cannotBeEstimated = true
-            break
-          }
-        }
-
-        if (cannotBeEstimated) {
+        if (shards > shardsSoftCap) {
           estimatedShardsValueLabel.textContent = "Cannot be estimated"
         } else {
           estimatedShardsValueLabel.textContent = shards
@@ -333,7 +337,7 @@
       /// Load from web storage to input gearscore if there is data
       function load () {
         if (!localStorage.lhInputs) {
-          return;
+          return
         }
 
         let lhInputsValues = localStorage.lhInputs.split(",")
